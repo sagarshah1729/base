@@ -6306,9 +6306,15 @@ public final class Settings {
                 "camera_double_tap_power_gesture_disabled";
 
         /**
-         * Whether the camera double twist gesture to flip between front and back mode should be
-         * enabled.
-         *
+         * Behavior of twilight on the device.
+         * One of {@link #TWILIGHT_MODE_LOCKED_OFF}, {@link #TWILIGHT_MODE_LOCKED_ON}
+         * or {@link #TWILIGHT_MODE_AUTO}.
+         * @hide
+         */
+        public static final String TWILIGHT_MODE = "twilight_mode";
+
+        /**
+         * Twilight mode always off.
          * @hide
          */
         public static final String CAMERA_DOUBLE_TWIST_TO_FLIP_ENABLED =
@@ -6470,6 +6476,17 @@ public final class Settings {
          * @hide
          */
         public static final String WEB_ACTION_ENABLED = "web_action_enabled";
+
+         /**
+         * Beginning of PureNexus Secure Settings Additions
+         * @hide
+         */
+
+        /**
+         * Whether to display the ADB notification.
+         * @hide
+         */
+        public static final String ADB_NOTIFY = "adb_notify";
 
         /**
          * This are the settings to be backed up.
