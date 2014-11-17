@@ -1051,10 +1051,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // Detect user pressing the power button in panic when an application has
         // taken over the whole screen.
         boolean panic = mImmersiveModeConfirmation.onPowerKeyDown(interactive,
-                SystemClock.elapsedRealtime(), isImmersiveMode(mLastSystemUiFlags),
-                isNavBarEmpty(mLastSystemUiFlags));
-        if (panic) {
-            mHandler.post(mHiddenNavPanic);
+                SystemClock.elapsedRealtime(), isImmersiveMode(mLastSystemUiFlags));
+        if (panic && !PolicyControl.isImmersiveFiltersActive()) {
+        mHandler.post(mHiddenNavPanic);
         }
 
         // Latch power key state to detect screenshot chord.
