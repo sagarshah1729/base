@@ -31,17 +31,16 @@
         android:textAppearance="@style/TextAppearance.Volume.Header"
         android:paddingStart="@dimen/volume_row_header_padding_start" />
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/volume_row_slider_height"
-            android:orientation="horizontal"
-            android:paddingStart="@dimen/volume_row_padding_start" >
-        <com.android.keyguard.AlphaOptimizedImageButton
-                android:id="@+id/volume_row_icon"
-                style="@style/VolumeButtons"
-                android:layout_width="@dimen/volume_button_size"
-                android:layout_height="@dimen/volume_button_size"
-                android:soundEffectsEnabled="false" />
+    <com.android.keyguard.AlphaOptimizedImageButton
+        android:id="@+id/volume_row_icon"
+        style="@style/VolumeButtons"
+        android:layout_width="@dimen/volume_button_size"
+        android:layout_height="@dimen/volume_button_size"
+        android:layout_below="@id/volume_row_header"
+        android:soundEffectsEnabled="false"
+        android:adjustViewBounds="true"
+        android:padding="12dp"
+        android:scaleType="fitCenter" />
 
         <SeekBar
                 android:id="@+id/volume_row_slider"
@@ -53,4 +52,4 @@
                 android:paddingStart="@dimen/volume_row_slider_padding_start"/>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
