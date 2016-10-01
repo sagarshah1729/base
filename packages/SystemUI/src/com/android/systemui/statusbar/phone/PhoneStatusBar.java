@@ -509,6 +509,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_COSMIC_LOGO_NUMBER_OF_NOTIFICATION_ICONS),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_PORTRAIT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_PORTRAIT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_LANDSCAPE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_LANDSCAPE),
+                    false, this, UserHandle.USER_ALL);
             update();
         }
 
@@ -543,7 +555,17 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     || uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_COSMIC_LOGO_NUMBER_OF_NOTIFICATION_ICONS))) {
                     setCosmicLogoVisibility();
-            }
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_PORTRAIT))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_PORTRAIT))) {
+                updateQSRowsColumnsPortrait();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_LANDSCAPE))
+                || uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_LANDSCAPE))) {
+                updateQSRowsColumnsLandscape();
+           }
             update();
         }
 
@@ -853,6 +875,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         addNavigationBar();
 
+        // Status bar settings observer
         SettingsObserver observer = new SettingsObserver(mHandler);
         observer.observe();
 
@@ -2616,6 +2639,20 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 0) == 1;
         if (mIconController != null) {
             mIconController.showKeyguardLogo(show);
+        }
+    }
+
+    private void updateQSRowsColumnsPortrait() {
+        Resources res = mContext.getResources();
+        if (res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            updateResources();
+        }
+    }
+
+    private void updateQSRowsColumnsLandscape() {
+        Resources res = mContext.getResources();
+        if (res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            updateResources();
         }
     }
 
