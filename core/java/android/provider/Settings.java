@@ -3800,7 +3800,7 @@ public final class Settings {
 
         /**
          * Whether to allow fullscreen screenshots or let the user select which area to screenshot
-         *
+         * @hide
          */
         public static final String SCREENSHOT_TYPE = "screenshot_type";
 
@@ -4386,34 +4386,6 @@ public final class Settings {
          * @hide
          */
         public static final String DIALER_OPENCNAM_AUTH_TOKEN = "dialer_opencnam_auth_token";
-
-        /**
-         * Number of rows used for the Quick Settings (portrait)
-         *
-         * @hide
-         */
-        public static final String QS_ROWS_PORTRAIT = "qs_rows_portrait";
-
-        /**
-         * Number of columns used for the Quick Settings (portrait)
-         *
-         * @hide
-         */
-        public static final String QS_COLUMNS_PORTRAIT = "qs_columns_portrait";
-
-        /**
-         * Number of rows used for the Quick Settings (landscape)
-         *
-         * @hide
-         */
-        public static final String QS_ROWS_LANDSCAPE = "qs_rows_landscape";
-
-        /**
-         * Number of columns used for the Quick Settings (landscape)
-         *
-         * @hide
-         */
-        public static final String QS_COLUMNS_LANDSCAPE = "qs_columns_landscape";
 
         /**
          * Quick Settings nougat animation
@@ -6925,6 +6897,26 @@ public final class Settings {
          */
         public static final String QS_BT_EASY_TOGGLE = "qs_bt_easy_toggle";
 
+        /**
+         * Number of rows used for the Quick Settings (portrait)
+         *
+         * @hide
+         */
+        public static final String QS_ROWS_PORTRAIT = "qs_rows_portrait";
+
+        /**
+         * Number of rows used for the Quick Settings (landscape)
+         *
+         * @hide
+         */
+        public static final String QS_ROWS_LANDSCAPE = "qs_rows_landscape";
+
+        /**
+         * Number of columns used for the Quick Settings
+         *
+         * @hide
+         */
+        public static final String QS_COLUMNS = "qs_columns";
 
         /**
          * Enable single click to turn WiFi on or off.
