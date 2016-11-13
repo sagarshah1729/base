@@ -57,14 +57,16 @@ import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.WindowManager;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.lang.reflect.Method;
+
+import com.android.internal.R;
 
 public final class ShutdownThread extends Thread {
     // constants
@@ -246,11 +248,37 @@ public final class ShutdownThread extends Thread {
 
             closer.dialog = sConfirmDialog;
             sConfirmDialog.setOnDismissListener(closer);
+            WindowManager.LayoutParams attrs = sConfirmDialog.getWindow().getAttributes();
+         
+            boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
+            int powermenuAnimations = isPrimary ? getPowermenuAnimations(context) : 0;
+
+            if (powermenuAnimations == 0) {
+            // default AOSP action
+            }
+            if (powermenuAnimations == 1) {
+                attrs.windowAnimations = R.style.PowerMenuBottomAnimation;
+                attrs.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
+            }
+            if (powermenuAnimations == 2) {
+                attrs.windowAnimations = R.style.PowerMenuTopAnimation;
+                attrs.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
+            }
+            if (powermenuAnimations == 3) {
+                attrs.windowAnimations = R.style.PowerMenuRotateAnimation;
+                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
+            }
+
             sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
             sConfirmDialog.show();
         } else {
             beginShutdownSequence(context);
         }
+    }
+
+    private static int getPowermenuAnimations(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.POWER_MENU_ANIMATIONS, 0);
     }
 
     private static void doSoftReboot() {
@@ -391,12 +419,32 @@ public final class ShutdownThread extends Thread {
         }
         pd.setCancelable(false);
         pd.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-
         pd.show();
 
         sInstance.mProgressDialog = pd;
         sInstance.mContext = context;
         sInstance.mPowerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
+
+        WindowManager.LayoutParams attrs = pd.getWindow().getAttributes();
+
+        boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
+        int powermenuAnimations = isPrimary ? getPowermenuAnimations(context) : 0;
+
+        if (powermenuAnimations == 0) {
+        // default AOSP action
+        }
+        if (powermenuAnimations == 1) {
+            attrs.windowAnimations = R.style.PowerMenuBottomAnimation;
+            attrs.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
+        }
+        if (powermenuAnimations == 2) {
+            attrs.windowAnimations = R.style.PowerMenuTopAnimation;
+            attrs.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
+        }
+        if (powermenuAnimations == 3) {
+            attrs.windowAnimations = R.style.PowerMenuRotateAnimation;
+            attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
+        }
 
         // make sure we never fall asleep again
         sInstance.mCpuWakeLock = null;
