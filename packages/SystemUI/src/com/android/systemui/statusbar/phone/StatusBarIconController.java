@@ -40,9 +40,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
+import android.widget.TextView;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.systemui.BatteryMeterView;
+import com.android.systemui.FontSizeUtils;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 import com.android.systemui.SystemUIFactory;
@@ -88,9 +89,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     private BatteryMeterView mBatteryMeterView;
     private BatteryMeterView mBatteryMeterViewKeyguard;
+    private TextView mClock;
     private NetworkTraffic mNetworkTraffic;
-    private ClockController mClockController;
-    private View mCenterClockLayout;
 
     private ImageView mCosmicLogo;
     private ImageView mCosmicLogoLeft;
@@ -165,12 +165,11 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         scaleBatteryMeterViews(context);
         mLogoColor = StatusBarColorHelper.getLogoColor(mContext);
 
+        mClock = (TextView) statusBar.findViewById(R.id.clock);
         mNetworkTraffic = (NetworkTraffic) statusBar.findViewById(R.id.networkTraffic);
         mDarkModeIconColorSingleTone = context.getColor(R.color.dark_mode_icon_color_single_tone);
         mLightModeIconColorSingleTone = context.getColor(R.color.light_mode_icon_color_single_tone);
         mHandler = new Handler();
-        mClockController = new ClockController(statusBar, mNotificationIconAreaController, mHandler);
-        mCenterClockLayout = statusBar.findViewById(R.id.center_clock_layout);
         loadDimens();
 
         TunerService.get(mContext).addTunable(this, ICON_BLACKLIST);
@@ -228,7 +227,6 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
                 com.android.internal.R.dimen.status_bar_icon_size);
         mIconHPadding = mContext.getResources().getDimensionPixelSize(
                 R.dimen.status_bar_icon_padding);
-        mClockController.updateFontSize();
     }
 
     private void addSystemIcon(int index, StatusBarIcon icon) {
@@ -347,17 +345,14 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     public void hideSystemIconArea(boolean animate) {
         animateHide(mSystemIconArea, animate);
-        animateHide(mCenterClockLayout, animate);
     }
 
     public void showSystemIconArea(boolean animate) {
         animateShow(mSystemIconArea, animate);
-        animateShow(mCenterClockLayout, animate);
     }
 
     public void hideNotificationIconArea(boolean animate) {
         animateHide(mNotificationIconAreaInner, animate);
-        animateHide(mCenterClockLayout, animate);
         if (mShowLogo && mLogoStyle == LOGO_LEFT) {
             animateHide(mCosmicLogoLeft, animate);
         }
@@ -368,7 +363,6 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
 
     public void showNotificationIconArea(boolean animate) {
         animateShow(mNotificationIconAreaInner, animate);
-        animateShow(mCenterClockLayout, animate);
         if (mShowLogo && mLogoStyle == LOGO_LEFT) {
             animateShow(mCosmicLogoLeft, animate);
         }
@@ -378,7 +372,7 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     }
 
     public void setClockVisibility(boolean visible) {
-        mClockController.setVisibility(visible);
+        mClock.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     public void setLogoVisibility(boolean showLogo, boolean forceHide, int maxAllowedIcons) {
@@ -621,8 +615,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
         mSignalCluster.setIconTint(mIconTint, mDarkIntensity, mTintArea);
         mBatteryMeterView.setDarkIntensity(
                 isInArea(mTintArea, mBatteryMeterView) ? mDarkIntensity : 0);
+        mClock.setTextColor(getTint(mTintArea, mClock, mIconTint));
 	    mNetworkTraffic.setDarkIntensity(mDarkIntensity);
-        mClockController.setTextColor(mTintArea, mIconTint);
         if (mShowLogo && mLogoStyle == LOGO_LEFT) {
             mCosmicLogoLeft.setImageTintList(ColorStateList.valueOf(getLogoTint(mTintArea, mCosmicLogo, mLogoColor)));
         }
@@ -698,8 +692,8 @@ public class StatusBarIconController extends StatusBarIconList implements Tunabl
     }
 
     private void updateClock() {
-        mClockController.updateFontSize();
-        mClockController.setPaddingRelative(
+        FontSizeUtils.updateFontSize(mClock, R.dimen.status_bar_clock_size);
+        mClock.setPaddingRelative(
                 mContext.getResources().getDimensionPixelSize(
                         R.dimen.status_bar_clock_starting_padding),
                 0,
