@@ -507,7 +507,7 @@ public class NetworkManagementService extends INetworkManagementService.Stub
             if (mLastPowerStateFromWifi != powerState) {
                 mLastPowerStateFromWifi = powerState;
                 try {
-                    getBatteryStats().noteWifiRadioPowerState(powerState, tsNanos);
+                    getBatteryStats().noteWifiRadioPowerState(powerState, tsNanos, uid);
                 } catch (RemoteException e) {
                 }
             }
@@ -1015,6 +1015,17 @@ public class NetworkManagementService extends INetworkManagementService.Stub
     //
     // INetworkManagementService members
     //
+    @Override
+    public INetd getNetdService() throws RemoteException {
+        final CountDownLatch connectedSignal = mConnectedSignal;
+        if (connectedSignal != null) {
+            try {
+                connectedSignal.await();
+            } catch (InterruptedException ignored) {}
+        }
+
+        return mNetdService;
+    }
 
     @Override
     public String[] listInterfaces() {
@@ -1363,8 +1374,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
             mConnector.execute("tether", "interface", "remove", iface);
         } catch (NativeDaemonConnectorException e) {
             throw e.rethrowAsParcelableException();
+        } finally {
+            removeInterfaceFromLocalNetwork(iface);
         }
-        removeInterfaceFromLocalNetwork(iface);
     }
 
     @Override
@@ -2869,28 +2881,18 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         modifyInterfaceInNetwork("remove", "local", iface);
     }
 
-    private BroadcastReceiver mZeroBalanceReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean isBlockAllData = false;
-            if(intent != null
-                    && intent.getAction().equals("org.codeaurora.restrictData")) {
-                isBlockAllData = intent.getBooleanExtra("Restrict",false);
-                Log.wtf("ZeroBalance", "Intent value to block unblock data"+isBlockAllData);
-            }
-            mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
+    @Override
+    public int removeRoutesFromLocalNetwork(List<RouteInfo> routes) {
+        int failures = 0;
 
-            // silently discard when control disabled
-            // TODO: eventually migrate to be always enabled
-            if (!mBandwidthControlEnabled) return;
+        for (RouteInfo route : routes) {
             try {
-                Log.wtf("ZeroBalance", "before calling connector Intent"
-                        +"value to block unblock data"+isBlockAllData);
-                mConnector.execute("bandwidth",
-                        isBlockAllData ? "blockAllData" : "unblockAllData");
-            } catch (NativeDaemonConnectorException e) {
-                throw e.rethrowAsParcelableException();
+                modifyRoute("remove", "local", route);
+            } catch (IllegalStateException e) {
+                failures++;
             }
         }
-    };
+
+        return failures;
+    }
 }
